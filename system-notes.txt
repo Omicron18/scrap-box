@@ -1,0 +1,36 @@
+###.bashrc
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000000
+HISTFILESIZE=1000000
+
+PS1="\e[1;32m[\$(date -u +"%Y-%m-%dT%H:%M:%SZ")] \u@\h \w\e[0m \n\$ "
+
+alias cds='cd $SCRATCHDIR'
+alias e='emacsclient'
+alias ag='echo "use rg"'
+alias qcopy='copyq copy -' # for piping stuff to the clipboard
+alias qpaste='copyq clipboard' # for piping stuff from the clipboard
+alias fd='fdfind'
+
+set-screen-title() {
+    printf "\ek$1\e\\"; # sets screen title
+    printf "\033]0;$1\007"; # sets terminal title
+}
+
+set-screen-title-do() {
+    set-screen-title $1 && $1;
+}
+
+alias top="set-screen-title-do top"
+alias pong="set-screen-title-do pong"
+alias screen='echo "use tmux"'
+
+export SCRATCHDIR="/home/timstorer/work/tmp/"$(date '+%Y/%m/%d')
+if [[ ! -d $SCRATCHDIR ]]; then
+    mkdir -p $SCRATCHDIR;
+    rm ~/work/tmp/today
+    ln -s $SCRATCHDIR/ ~/work/tmp/today
+fi
+
+remind ~/notes/remind.txt
