@@ -1,1 +1,39 @@
-/home/timstorer/work/projects/other/timstorer/scripts/pong/pong
+#!/bin/bash
+
+set -E
+
+function cleanup() {
+    stty echo
+}
+
+# Define a function to handle SIGINT
+function handle_sigint() {
+    echo "Ctrl+C caught... exiting"
+    # Perform cleanup actions here
+    cleanup
+    exit 0
+}
+function handle_err() {
+    echo "Error $1 caught... exiting"
+    # Perform cleanup actions here
+    cleanup
+    exit 0
+}
+
+
+
+# Set the trap to call the function when SIGINT is received
+trap handle_sigint SIGINT
+
+### this stuff doesn't work:
+### the idea is that I wanted to return the exit code from ping; but never mind
+trap 'handle_err $? $LINENO' ERR
+
+stty -echo
+ping 8.8.8.8 -W 1 2>&1 | perl -lane 'use POSIX qw(strftime); $t=strftime("%Y-%m-%dT%H:%M:%SZ", gmtime()); if ($_ =~ m/64 bytes from (.+): icmp_seq=(\d+) ttl=(\d+) time=([\d.]+) ms/) { $s = $2 % 100; $seq=sprintf("..%02d", $s); $rtt=sprintf("%5s",sprintf("%.1f",$4));print "$t icmp_seq=$seq time=$rtt ms" } else { print $t," # ",$_ }'
+
+# echo "shouldn't get here?" ## we do
+echo "Exiting"
+cleanup
+exit 99
+
