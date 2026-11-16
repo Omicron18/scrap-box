@@ -30,7 +30,7 @@ trap handle_sigint SIGINT
 trap 'handle_err $? $LINENO' ERR
 
 stty -echo
-ping 8.8.8.8 -W 1 2>&1 | perl -lane 'use POSIX qw(strftime); $t=strftime("%Y-%m-%dT%H:%M:%SZ", gmtime()); if ($_ =~ m/64 bytes from (.+): icmp_seq=(\d+) ttl=(\d+) time=([\d.]+) ms/) { $s = $2 % 100; $seq=sprintf("..%02d", $s); $rtt=sprintf("%5s",sprintf("%.1f",$4));print "$t icmp_seq=$seq time=$rtt ms" } else { print $t," # ",$_ }'
+ping 8.8.8.8 -W 1 2>&1 | perl -lane 'use POSIX qw(strftime); $t=strftime("%Y-%m-%dT%H:%M:%SZ", gmtime()); if ($_ =~ m/64 bytes from (.+): icmp_seq=(\d+) ttl=(\d+) time=([\d.]+) ms/) { $s = $2 % 100; $seq=sprintf("..%02d", $s); if ($4>9999) {$rtt="9999.99";} else {$rtt=sprintf("%6s",sprintf("%.1f",$4));}; print "$t icmp_seq=$seq time=$rtt ms" } else { print $t," # ",$_ }'
 
 # echo "shouldn't get here?" ## we do
 echo "Exiting"
